@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>聊天室</title>
+</head>
+<style>
+    .maindiv{
+        text-align:center;
+        width: 500px;
+    }
+</style>
+<body>
+    <div class="maindiv">
+        <div style="text-align: left">
+            <div  id="content"></div>
+
+            <input id="msg"/><button onclick="send();">send</button>
+            <br/><br/><br/>
+            <hr/>
+            <div id="userList"></div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="jquery-1.8.3.min.js"></script>
+<script>
+    var username;
+    $.ajax({
+        url:"/getName",
+        async: false,
+        success: function (data) {
+            username=data;
+        }
+    });
+console.log(username+"可以");
+    var ws;
+    var target = "ws://localhost:8080/chatSocket?username="+username;
+    window.onload=function (){
+        //进入聊天页面就打开websocket链接
+
+        if (ws!=null) {
+            return ws;
+        }else{
+            ws = new WebSocket(target);
+        }
+        ws.onmessage = function (data){
+            //console.info(data);
+            var msg = eval("("+data.data+")");
+            if (msg.message!=undefined) {
+                $('#content').append(msg.message);
+            }
+            if (msg.welcome!=undefined) {
+                $('#content').append(msg.welcome);
+
+            }
+            if(msg.userNames!=undefined){
+                $("#userList").html('');
+                $(msg.userNames).each(function () {
+                    $("#userList").append("<input type='checkbox' value='"+this+"'/>"+this+"<br/>");
+                });
+            }
+
+        }
+
+    }
+    function send(){
+        var obj;
+        var checkbox = $("#userList :checked");
+        var msg = document.getElementById("msg").value;//说的内容
+        var to = checkbox.val(); //私聊的人
+        if(checkbox.size()>0){
+            obj = {
+                to:to,
+                msg:msg,
+                type:1
+            }
+        } else {
+            obj = {
+                msg:msg,
+                type:0
+            }
+        }
+        //发送到服务器的内容
+        var sendStr = JSON.stringify(obj);
+        ws.send(sendStr);
+        /* 	var msg = document.getElementById("msg");
+            ws.send(msg.value);
+            msg.value=""; */
+    }
+
+    //退出页面时关闭ws对象
+    window.onunload = function() {
+        ws.close();
+    }
+</script>
+</html>
