@@ -34,7 +34,7 @@
     });
 console.log(username+"可以");
     var ws;
-    var target = "ws://localhost:8080/chatSocket?username="+username;
+    var target = "ws://"+window.location.host+"/chatSocket?username="+username;
     window.onload=function (){
         //进入聊天页面就打开websocket链接
 
