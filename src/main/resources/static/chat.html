@@ -28,6 +28,7 @@
     $.ajax({
         url:"/getName",
         async: false,
+        contentType: 'text/json,charset=utf-8',
         success: function (data) {
             username=data;
         }

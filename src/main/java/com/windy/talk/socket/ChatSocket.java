@@ -12,6 +12,8 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +27,17 @@ public class ChatSocket {
     private static Map<String, Session> map = new HashMap<String,Session>();
     private static List<String> names = new ArrayList<String>();
     @OnOpen
-    public void open(Session session) {
+    public void open(Session session) throws UnsupportedEncodingException {
         String queryString = session.getQueryString();
         username=queryString.split("=")[1];
-        System.out.println(username);
+        /**
+         * 使用urldecoder解码
+         */
+        username = URLDecoder.decode(username, "utf-8");
         this.session.add(session);
         this.names.add(username);
         this.map.put(this.username, session);
-        String msg = "欢迎"+this.username+"进入聊天室！！<br/>";
+        String msg = "欢迎 "+this.username+" 进入聊天室！！<br/>";
         Message message = new Message();
         message.setUserNames(this.names);
         message.setWelcome(msg);
@@ -52,7 +57,7 @@ public class ChatSocket {
         this.session.remove(session);
         this.names.remove(this.username);
         this.map.remove(this.username);
-        String msg = "欢送"+this.username+"离开聊天室！！<br/>";
+        String msg = "欢送 "+this.username+" 离开聊天室！！<br/>";
         Message message = new Message();
         message.setUserNames(this.names);
         message.setWelcome(msg);
@@ -73,6 +78,11 @@ public class ChatSocket {
             message.setMessage(msg2);
             try {
                 to.getBasicRemote().sendText(message.toJson());
+
+                Message message1 = new Message();
+                String msg3 = "你对 "+chat.getTo()+"说： "+chat.getMsg()+"<br/>";//前台显示的话
+                message1.setMessage(msg3);
+                session.getBasicRemote().sendText(message1.toJson());
             } catch (IOException e) {
                 e.printStackTrace();
             }
