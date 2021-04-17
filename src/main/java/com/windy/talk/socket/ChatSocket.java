@@ -45,8 +45,10 @@ public class ChatSocket {
     private void broadcast(List<Session> ss, String msg) {
         for(Session session:ss) {
             try {
+
                 session.getBasicRemote().sendText(msg);
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -76,6 +78,11 @@ public class ChatSocket {
             message.setMessage(msg2);
             try {
                 to.getBasicRemote().sendText(message.toJson());
+
+                Message message1 = new Message();
+                String msg3 = "你对 "+chat.getTo()+"说： "+chat.getMsg()+"<br/>";//前台显示的话
+                message1.setMessage(msg3);
+                session.getBasicRemote().sendText(message1.toJson());
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -24,6 +24,7 @@
 </body>
 <script type="text/javascript" src="jquery-1.8.3.min.js"></script>
 <script>
+    //获取当前登录用户名
     var username;
     $.ajax({
         url:"/getName",
@@ -33,7 +34,7 @@
             username=data;
         }
     });
-console.log(username+"可以");
+
     var ws;
     var target = "ws://"+window.location.host+"/chatSocket?username="+username;
     window.onload=function (){
@@ -44,6 +45,7 @@ console.log(username+"可以");
         }else{
             ws = new WebSocket(target);
         }
+        //收到消息的回调
         ws.onmessage = function (data){
             //console.info(data);
             var msg = eval("("+data.data+")");
@@ -64,6 +66,7 @@ console.log(username+"可以");
         }
 
     }
+
     function send(){
         var obj;
         var checkbox = $("#userList :checked");
@@ -93,5 +96,16 @@ console.log(username+"可以");
     window.onunload = function() {
         ws.close();
     }
+
+
+    //按回车发送信息
+    document.onkeyup = function(e) {
+        // 兼容FF和IE和Opera
+        var event = e || window.event;
+        var key = event.which || event.keyCode || event.charCode;
+        if (key == 13) {
+            send()
+        }
+    };
 </script>
 </html>

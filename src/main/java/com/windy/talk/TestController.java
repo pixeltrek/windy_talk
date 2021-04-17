@@ -9,4 +9,10 @@ public class TestController {
     public String say(){
         return "hello world";
     }
+
+    public static void main(String[] args) {
+        String a = "aaa说： It's too good to be true";
+        String substring = a.substring(a.indexOf("说"), a.length());
+        System.out.println(substring);
+    }
 }
