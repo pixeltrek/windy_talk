@@ -8,6 +8,16 @@ public class Message {
     private String welcome;
     private List<String> userNames;
     private String message;
+    private String currentUserName;
+
+    public String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public void setCurrentUserName(String currentUserName) {
+        this.currentUserName = currentUserName;
+    }
+
     public String getMessage() {
         return message;
     }

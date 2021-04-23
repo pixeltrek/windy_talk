@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous">
     </script>
+
 </head>
 <style type="text/css">
     .chat{
@@ -42,10 +43,10 @@
     </div>
     <div class="row">
 <!--        scrollTop='scrollHeight'-->
-        <div id="content"  style="overflow:auto" class="col-sm-6 col-sm-offset-3 chat chat_mag"></div>
 
-        <div class="col-sm-2  chat contact"><div id="userList"></div></div>
 
+        <div class="col-sm-2 col-sm-offset-3 chat contact"><b>在线的人</b><div class="checkbox" id="userList"></div></div>
+        <div id="content"  style="overflow:auto" class="col-sm-6  chat chat_mag"><b>您正在公共聊天室<br /></b></div>
     </div>
 
     <div class="row">
@@ -55,9 +56,9 @@
                 <div  class="col-sm-12 input-group" >
 
                     <textarea id="msg" style="height: 100px;" class="form-control col-sm-12"  aria-label="With textarea"></textarea>
-
+                    <div class="col-sm-offset-11"><button onclick="send()" type="button" class="btn btn-dark">发送</button></div>
                 </div>
-                <div class="col-sm-offset-11"><button onclick="send()" type="button" class="btn btn-dark">发送</button></div>
+
 
 
             </div>
@@ -68,8 +69,9 @@
     </div>
 </div>
 </body>
+
 <script>
-    //获取当前登录用户名
+
     var username;
     $.ajax({
         url:"/getName",
@@ -83,6 +85,7 @@
     //定义websockets全局对象
     var ws;
     var target = "ws://"+window.location.host+"/chatSocket?username="+username;
+
     window.onload=function (){
         //进入聊天页面就打开websocket链接
 
@@ -95,6 +98,21 @@
         ws.onmessage = function (data){
             //console.info(data);
             var msg = eval("("+data.data+")");
+
+            var myUserName;
+            if(msg.userNames!=undefined){
+                $("#userList").html('');
+                $(msg.userNames).each(function () {
+
+                    if (this != username) {
+                        $("#userList").append("<label><input type='checkbox' value='"+this+"'/>"+this+"</label><br/>");
+
+                    }else {
+
+                        $("#userList").append("您 "+this+"<br/>");
+                    }
+                });
+            }
             if (msg.message!=undefined) {
                 $('#content').append(msg.message);
             }
@@ -102,25 +120,22 @@
                 $('#content').append(msg.welcome);
 
             }
-            if(msg.userNames!=undefined){
-                $("#userList").html('');
-                $(msg.userNames).each(function () {
-                    $("#userList").append("<input type='checkbox' value='"+this+"'/>"+this+"<br/>");
-                });
+            if (username == msg.currentUserName){
+                vm.active=true
             }
 
             var showdiv = document.getElementById("content")
             showdiv.scrollTop = showdiv.scrollHeight
         }
-
     }
 
     function send(){
         var obj;
         var checkbox = $("#userList :checked");
-        console.log(checkbox.s)
+
         var msg = document.getElementById("msg").value;//说的内容
         var to = checkbox.val(); //私聊的人
+        console.log(to)
         if(checkbox.size()>0){
             obj = {
                 to:to,
@@ -157,4 +172,5 @@
         }
     };
 </script>
+
 </html>
