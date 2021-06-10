@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TalkApplication {
 
-	public static void mainHandle(String[] args) {
+	public static void mainHandler(String[] args) {
 		SpringApplication.run(TalkApplication.class, args);
 	}
 
